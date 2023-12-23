@@ -35,7 +35,7 @@ func (p PostRepository) FindAll(post models.Post, keyword string) (*[]models.Pos
 
 	err := queryBuilder.
 		Where(post).
-		Find(&post).
+		Find(&posts).
 		Count(&totalRows).Error
 
 	return &posts, totalRows, err
