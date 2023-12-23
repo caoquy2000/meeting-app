@@ -1,18 +1,27 @@
 package main
 
 import (
-	"net/http"
-
+	"github.com/caoquy2000/meeting-app/api/controller"
+	"github.com/caoquy2000/meeting-app/api/repository"
+	"github.com/caoquy2000/meeting-app/api/routes"
+	"github.com/caoquy2000/meeting-app/api/service"
 	"github.com/caoquy2000/meeting-app/infrastructure"
-	"github.com/gin-gonic/gin"
+	"github.com/caoquy2000/meeting-app/models"
 )
 
+func init() {
+	infrastructure.LoadEnv()
+}
+
 func main() {
-	router := gin.Default()
-	router.GET("/", func(context *gin.Context) {
-		infrastructure.LoadEnv()
-		infrastructure.NewDatabase()
-		context.JSON(http.StatusOK, gin.H{"data": "Hello World"})
-	})
-	router.Run(":8000")
+	router := infrastructure.NewGinRouter()
+	db := infrastructure.NewDatabase()
+	postRepository := repository.NewPostRepository(db)
+	postService := service.NewPostService(postRepository)
+	postController := controller.NewPostController(postService)
+	postRoute := routes.NewPostRoute(postController, router)
+	postRoute.Setup()
+
+	db.DB.AutoMigrate(&models.Post{})
+	router.Gin.Run(":8000")
 }
