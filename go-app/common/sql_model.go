@@ -11,5 +11,6 @@ type SQLModel struct {
 }
 
 func (m *SQLModel) GenUID(dbType int) {
-	uid
+	uid := NewUID(uint32(m.Id), dbType, 1)
+	m.FakeId = &uid
 }
